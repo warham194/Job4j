@@ -16,34 +16,37 @@ public class SimpleBlockingQueue<T> {
     private Queue<T> queue = new LinkedList<>();
     private final int capacity = 5;
 
+    public SimpleBlockingQueue() {
+        this.queue =  new LinkedList<>();
+    }
 
 
-    public void offer(T value) throws InterruptedException {
+    public void offer(T value) {
         synchronized (this) {
-            while (this.queue.size() >= this.capacity) {
+            while (this.queue.size() > this.capacity) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
             }
             this.queue.add(value);
-            notify();
+            notifyAll();
         }
     }
 
-    public T poll() throws InterruptedException {
+    public T poll() {
         synchronized (this) {
             while (this.queue.size() <= 0) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
             }
             T result = this.queue.poll();  // Вопрос по методу poll()
             if (this.queue.size() != this.capacity) {
-                notify();
+                notifyAll();
             }
             return result;
         }

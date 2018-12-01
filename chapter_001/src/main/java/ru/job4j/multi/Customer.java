@@ -3,7 +3,7 @@ package ru.job4j.multi;
 /**
  * Created by Lenovo2 on 23.11.2018.
  */
-public class Customer implements Runnable{
+public class Customer implements Runnable {
     private final SimpleBlockingQueue<Integer> tasksQueue;
 
     /**
@@ -16,7 +16,7 @@ public class Customer implements Runnable{
 
     @Override
     public void run() {
-        for (int i = 0 ; i <= 5; i++) {
+        for (int i = 0; i <= 5; i++) {
             try {
                 int data = this.tasksQueue.poll();
                 System.out.printf("Consumer - Data: %d; Size: %d%s", data, this.tasksQueue.size(), System.lineSeparator());

@@ -1,12 +1,14 @@
 package ru.job4j.multi;
 
-import static com.sun.org.apache.xerces.internal.util.PropertyState.is;
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
+
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 
 /**
  * Created by Lenovo2 on 24.11.2018.
@@ -42,26 +44,20 @@ public class SimpleBlockingQueueTest {
     public void whenFetchAllThenGetIt() throws InterruptedException {
         final CopyOnWriteArrayList<Integer> buffer = new CopyOnWriteArrayList<>();
         final SimpleBlockingQueue<Integer> queue = new SimpleBlockingQueue<>();
-        Thread producer = new Thread(
-                () -> {
-                    IntStream.range(0, 5).forEach(
-                            queue::offer
-                    );
-                }
-        );
+        Thread producer = new Thread(() -> {
+            IntStream.range(0, 5).forEach(queue::offer);
+        });
         producer.start();
-        Thread consumer = new Thread(
-                () -> {
-                    while (!queue.isEmpty() || !Thread.currentThread().isInterrupted()) {
-                        try {
-                            buffer.add(queue.poll());
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                            Thread.currentThread().interrupt();
-                        }
-                    }
+        Thread consumer = new Thread(() -> {
+            while (!queue.isEmpty() || !Thread.currentThread().isInterrupted()) {
+                try {
+                    buffer.add(queue.poll());
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
-        );
+            }
+        });
         consumer.start();
         producer.join();
         consumer.interrupt();
