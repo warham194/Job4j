@@ -14,20 +14,13 @@ import java.util.Queue;
 public class SimpleBlockingQueue<T> {
     @GuardedBy("this")
     private Queue<T> queue = new LinkedList<>();
-    private final int capacity;
-
-    /**
-     * Constructor.
-     * @param capacity Max size.
-     */
-    public SimpleBlockingQueue(int capacity) {
-        this.capacity = capacity;
-    }
+    private final int capacity = 5;
 
 
-    public void offer(T value) {
+
+    public void offer(T value) throws InterruptedException {
         synchronized (this) {
-            while (this.queue.size() == this.capacity) {
+            while (this.queue.size() >= this.capacity) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
@@ -39,16 +32,16 @@ public class SimpleBlockingQueue<T> {
         }
     }
 
-    public T poll() {
+    public T poll() throws InterruptedException {
         synchronized (this) {
-            while (this.queue.size() == 0) {
+            while (this.queue.size() <= 0) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            T result = this.queue.remove();  // Вопрос по методу poll()
+            T result = this.queue.poll();  // Вопрос по методу poll()
             if (this.queue.size() != this.capacity) {
                 notify();
             }
@@ -60,6 +53,10 @@ public class SimpleBlockingQueue<T> {
         synchronized (this) {
             return this.queue.size();
         }
+    }
+
+    public boolean isEmpty() {
+        return this.queue.size() == 0;
     }
 
 }

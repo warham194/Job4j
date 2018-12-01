@@ -1,3 +1,5 @@
+package ru.job4j.multi;
+
 import static org.junit.Assert.*;
 
 /**
