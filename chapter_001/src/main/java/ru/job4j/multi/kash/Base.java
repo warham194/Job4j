@@ -6,9 +6,11 @@ package ru.job4j.multi.kash;
 public class Base {
     private final int id;
     private int version = 0;
+    private String name;
 
-    public Base(int id) {
+    public Base(int id, String name) {
         this.id = id;
+        this.name = name;
     }
 
     public int getId() {
@@ -45,5 +47,9 @@ public class Base {
 
     public void increment() {
         this.version++;
+    }
+
+    public void update(Base base) {
+        this.name = base.name;
     }
 }
