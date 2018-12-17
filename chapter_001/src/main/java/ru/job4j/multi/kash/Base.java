@@ -5,7 +5,7 @@ package ru.job4j.multi.kash;
  */
 public class Base {
     private final int id;
-    private int version = 0;
+    private int version;
     private String name;
 
     public Base(int id, String name) {
@@ -52,4 +52,5 @@ public class Base {
     public void update(Base base) {
         this.name = base.name;
     }
+
 }
