@@ -15,11 +15,12 @@ public class CacheBaseTest {
     @Test
     public void whenThrowException() throws InterruptedException {
         CacheBase cacheBase = new CacheBase();
-        cacheBase.add(new Base(1, "Ivan"));
+        Base base = new Base(1, "Ivan");
+        cacheBase.add(base);
         AtomicReference<Exception> ex = new AtomicReference<>();
         Runnable runOne = () -> {
             try {
-                cacheBase.update(new Base(1, "Ilya"));
+                cacheBase.update(base);
             } catch (OptimisticException e) {
                 ex.set(e);
             }
@@ -27,7 +28,7 @@ public class CacheBaseTest {
 
         Runnable runTwo = () -> {
             try {
-                cacheBase.update(new Base(1, "Max"));
+                cacheBase.update(base);
             } catch (OptimisticException e) {
                 ex.set(e);
             }
@@ -35,7 +36,7 @@ public class CacheBaseTest {
 
         Runnable runThree = () -> {
             try {
-                cacheBase.update(new Base(1, "Anton"));
+                cacheBase.update(new Base(1, "Ivan"));
             } catch (OptimisticException e) {
                 ex.set(e);
             }
