@@ -18,7 +18,7 @@ public class CacheBase {
      * @param model model.
      */
     public void add(Base model) {
-        this.values.putIfAbsent(model.getId(), model);
+        this.values.put(model.getId(), model);
     }
 
     /**
@@ -28,12 +28,12 @@ public class CacheBase {
      */
     public void update(Base model) {
         values.computeIfPresent(model.getId(), (key, value) -> {
-            if (values.get(model.getId()).getVersion() != model.getVersion()) {
+            if (value.getVersion() != model.getVersion()) {
                 throw new OptimisticException("Wrong in version!");
+            } else {
+                model.increment();
+                return model;
             }
-            value.update(model);
-            value.increment();
-            return value;
         });
     }
 
@@ -60,5 +60,9 @@ public class CacheBase {
      */
     public ConcurrentHashMap<Integer, Base> getValues() {
         return this.values;
+    }
+
+    public int size() {
+        return this.values.size();
     }
 }

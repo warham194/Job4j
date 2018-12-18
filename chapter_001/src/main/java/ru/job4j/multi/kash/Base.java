@@ -11,7 +11,15 @@ public class Base {
     public Base(int id, String name) {
         this.id = id;
         this.name = name;
+        this.version = 0;
     }
+    public Base(Base model) {
+        this.id = model.id;
+        this.name = model.name;
+        this.version = model.version;
+    }
+
+
 
     public int getId() {
         return id;
@@ -19,6 +27,10 @@ public class Base {
 
     public int getVersion() {
         return version;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -49,8 +61,8 @@ public class Base {
         this.version++;
     }
 
-    public void update(Base base) {
-        this.name = base.name;
+    public void up(String newName) {
+        this.name = newName;
     }
 
 }
