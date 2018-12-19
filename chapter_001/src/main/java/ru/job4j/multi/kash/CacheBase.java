@@ -31,7 +31,8 @@ public class CacheBase {
             if (value.getVersion() != model.getVersion()) {
                 throw new OptimisticException("Wrong in version!");
             } else {
-                model.increment();
+                value.up(model.getName());
+                value.increment();
                 return model;
             }
         });
