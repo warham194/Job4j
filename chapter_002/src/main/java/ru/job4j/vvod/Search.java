@@ -37,9 +37,11 @@ public class Search {
     }
 
     public File addFileWithEx(List<String> exceptions, File file) {
-        for (String s : exceptions) {
-            if (file.getName().endsWith(s))
-                return file;
+        if (file != null) {
+            for (String s : exceptions) {
+                if (file.getName().endsWith(s))
+                    return file;
+            }
         }
         return null;
     }

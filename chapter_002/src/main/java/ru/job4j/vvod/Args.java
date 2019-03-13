@@ -1,5 +1,6 @@
 package ru.job4j.vvod;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,55 +12,33 @@ public class Args {
      * Аргументы
      */
     private String directory = "-d";
-    private String extensions = "-e";
     private String output = "-o";
+    private String extensions = "-e";
     /**
      * Список аргументов
      */
-    private String[] args;
+    private List<String> ext = new ArrayList<>();
 
     public Args(String[] args) {
-        this.args = args;
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-d")) {
+                this.directory = args[++i];
+            } else if (args[i].equals("-o")) {
+                this.output = args[++i];
+            } else if (args[i].equals("-e")) {
+                this.ext.add(args[++i]);
+            }
+        }
     }
 
-    /**
-     * Analiz argument
-     */
-    private String argumentAnalise(String arg) {
-        String result = "" ;
-        try {
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals(arg) && i < args.length - 1) {
-                    result = args[i+1];
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result.trim();
-        /* не работает
-         String result = "";
-        for (int i = 0; i <  args.length; i++) {
-            if (args[i].equals(arg)) {
-                while (i < args.length - 1) {
-                    result = result + args[++i] + " ";
-                    if (i + 1 == args.length ||  args[i + 1].contains("-")) {
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-        return result.trim();
-         */
-    }
+
 
     /**
      *  directory.
      * @return string
      */
     public String directory() {
-        return argumentAnalise(this.directory);
+        return this.directory;
     }
 
     /**
@@ -67,8 +46,7 @@ public class Args {
      * @return list string
      */
     public List<String> exclude() {
-        String result = argumentAnalise(this.extensions);
-        return Arrays.asList(result.split(" "));
+        return this.ext;
     }
 
     /**
@@ -76,6 +54,6 @@ public class Args {
      * @return string
      */
     public String output() {
-        return argumentAnalise(this.output());
+        return this.output;
     }
 }

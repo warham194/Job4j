@@ -39,17 +39,31 @@ public class ArchivedZip {
         try(ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(zip))) {
             Search search = new Search();
             List<File> list = search.files(dir, ex);
-            byte[] buf = new byte[1024];
             for (File f : list) {
                 ZipEntry zipEntry = new ZipEntry(Paths.get(dir).relativize(Paths.get(f.getPath())).toString());
                 outputStream.putNextEntry(zipEntry);
                 FileInputStream fileInputStream = new FileInputStream(f);
-                int bytesRead = fileInputStream.read(buf);
-                while (bytesRead > -1) {
-                    outputStream.write(buf, 0, bytesRead);
-                    bytesRead = fileInputStream.read(buf);
-                }
+                writeStreamIsToOut(fileInputStream, outputStream);
             }
+        }
+    }
+
+
+    /**
+     * write to stream.
+     * @param is - input stream
+     * @param os - output stream
+     */
+    private void writeStreamIsToOut(InputStream is, OutputStream os) throws IOException {
+        try {
+            byte[] buffer = new byte[1024];
+            int bytes;
+            while ((bytes = is.read(buffer)) > -1) {
+                os.write(buffer, 0, bytes);
+            }
+        } finally {
+            is.close();
+            os.flush();
         }
     }
 
