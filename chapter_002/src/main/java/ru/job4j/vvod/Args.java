@@ -1,52 +1,29 @@
 package ru.job4j.vvod;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-/**
- * Created by Lenovo2 on 10.03.2019.
- */
 public class Args {
-    /**
-     * Аргументы
-     */
-    private String directory = "-d";
-    private String output = "-o";
-    private String extensions = "-e";
-    /**
-     * Список аргументов
-     */
-    private List<String> ext = new ArrayList<>();
+    private final Map<String, String> action = new HashMap<>();
+    private final List<String> inputArg = Arrays.asList("-d", "-e", "-o");
 
     public Args(String[] args) {
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-d")) {
-                this.directory = args[++i];
-            } else if (args[i].equals("-o")) {
-                this.output = args[++i];
-            } else if (args[i].equals("-e")) {
-                this.ext.add(args[++i]);
-            }
-        }
+        command(args);
     }
-
-
 
     /**
      *  directory.
      * @return string
      */
     public String directory() {
-        return this.directory;
+        return action.get("-d");
     }
 
     /**
      * extensions.
      * @return list string
      */
-    public List<String> exclude() {
-        return this.ext;
+    public String exclude() {
+        return action.get("-e");
     }
 
     /**
@@ -54,6 +31,34 @@ public class Args {
      * @return string
      */
     public String output() {
-        return this.output;
+        return action.get("-o");
+    }
+
+    private void command(String[] args) {
+        if (args.length != 6) {
+            throw new IllegalArgumentException();
+        }
+        for (int i = 0; i < args.length - 1; i++) {
+            if (inputArg.contains(args[i])) {
+                action.put(args[i], args[i + 1]);
+            }
+        }
+        if (action.size() != inputArg.size()) {
+            throw new IllegalArgumentException("Введены неверные аргументы");
+        }
+    }
+
+    /**
+     * После инициализации аргументов передаем в упорядоченном виде
+     * в класс ZipArchiver для архивации
+     * @param args вводимые аргументы
+     */
+    public static void main(String[] args) {
+        Args result = new Args(args);
+        String directory = result.action.get("-d");
+        String exclude = result.action.get("-e");
+        String output = result.action.get("-o");
+        ArchivedZip archivedZip = new ArchivedZip(directory, exclude, output);
+        archivedZip.doZip();
     }
 }

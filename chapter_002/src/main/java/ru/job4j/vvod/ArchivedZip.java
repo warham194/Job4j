@@ -3,7 +3,10 @@ package ru.job4j.vvod;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -11,60 +14,71 @@ import java.util.zip.ZipOutputStream;
  * Created by Lenovo2 on 10.03.2019.
  */
 public class ArchivedZip {
+    final File path;
+    final String output;
+    final String exclude;
+    final List<File> files;
 
     /**
-     * Path to directory.
+     *
+     * @param directory Дирректория, которую надо архивировать
+     * @param exclude Файл, или расширение, которое необходимо исключить из архива
+     * @param output Путь + Имя архива
      */
-    private static String dir;
-    /**
-     * Path to output file.
-     */
-    private static String zip;
-    /**
-     * List of extensions.
-     */
-    private static List<String> ex;
-
-    public static void main(String[] args) {
-        Args arg = new Args(args);
-        dir = arg.directory();
-        zip = arg.output();
-        ex = arg.exclude();
+    public ArchivedZip(String directory, String exclude, String output) {
+        this.path = new File(directory);
+        this.output = output;
+        this.exclude = exclude;
+        this.files = new Search().files(directory, Collections.singletonList(""));
     }
 
     /**
-     * Metod file to zip
+     * данные добавляются в Queue, достаются и сразу проверяются не является ли файл дирректорией
+     * Если файл дирректория, он добавляется в Zip
+     * Если файл не дирректория, осуществляется проверка на НЕсоответствие параметру exclude, если проверка прошла успешна,
+     * файл добавляется в Zip, затем записывается через FileInputStream;
      */
-    public void zipArchive() throws IOException {
-        try(ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(zip))) {
-            Search search = new Search();
-            List<File> list = search.files(dir, ex);
-            for (File f : list) {
-                ZipEntry zipEntry = new ZipEntry(Paths.get(dir).relativize(Paths.get(f.getPath())).toString());
-                outputStream.putNextEntry(zipEntry);
-                FileInputStream fileInputStream = new FileInputStream(f);
-                writeStreamIsToOut(fileInputStream, outputStream);
+    public void doZip() {
+        try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(output))) {
+            Queue<File> data = new LinkedList<>();
+            data.offer(path);
+            while (!data.isEmpty()) {
+                File file = data.poll();
+                if (file.isDirectory()) {
+                    zout.putNextEntry(new ZipEntry(getPath(file) + File.separator));
+                    for (File f : file.listFiles()) {
+                        data.offer(f);
+                    }
+                } else {
+                    if (!file.getName().contains(exclude)) {
+                        FileInputStream fin = new FileInputStream(file.getPath());
+                        zout.putNextEntry(new ZipEntry(getPath(file)));
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while ((length = fin.read(buffer)) != -1) {
+                            zout.write(buffer, 0, length);
+                        }
+                        zout.closeEntry();
+                        fin.close();
+                    }
+                }
             }
         }
-    }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
 
+    }
 
     /**
-     * write to stream.
-     * @param is - input stream
-     * @param os - output stream
+     * @param file файл.
+     * @return форматированное полное имя файла.
      */
-    private void writeStreamIsToOut(InputStream is, OutputStream os) throws IOException {
-        try {
-            byte[] buffer = new byte[1024];
-            int bytes;
-            while ((bytes = is.read(buffer)) > -1) {
-                os.write(buffer, 0, bytes);
-            }
-        } finally {
-            is.close();
-            os.flush();
+    private String getPath(File file) {
+        String result = file.getAbsolutePath().replace(path.getPath(), "");
+        if (result.startsWith(File.separator)) {
+            result = result.replaceFirst("[" + File.separator + "/\\Q \\\\E]", "");
         }
+        return result;
     }
-
 }
