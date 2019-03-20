@@ -49,8 +49,6 @@ public class Args {
     }
 
     /**
-     * После инициализации аргументов передаем в упорядоченном виде
-     * в класс ZipArchiver для архивации
      * @param args вводимые аргументы
      */
     public static void main(String[] args) {

@@ -25,11 +25,11 @@ public class ArchivedTest {
     @Test
     public void whenAddArgumentsThenTrue() {
         Args args = new Args(new String[]{
-                "-d", "SimpleDirectory",
+                "-d", "Directory",
                 "-o", "output.txt",
                 "-e", "exclude.rtf"
         });
-        assertThat(args.directory(), is("SimpleDirectory"));
+        assertThat(args.directory(), is("Directory"));
         assertThat(args.output(), is("output.txt"));
         assertThat(args.exclude(), is("exclude.rtf"));
     }
@@ -37,8 +37,8 @@ public class ArchivedTest {
     @Test(expected = IllegalArgumentException.class)
     public void whenAddUnsupportedArgumentsThenEx() {
         Args args = new Args(new String[]{
-                "-d", "SimpleDirectory",
-                "-zzzzz", "output.txt",
+                "-d", "Directory",
+                "-f", "output.txt",
                 "-e", "exclude.rtf"
         });
     }

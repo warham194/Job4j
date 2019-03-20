@@ -21,9 +21,9 @@ public class ArchivedZip {
 
     /**
      *
-     * @param directory Дирректория, которую надо архивировать
-     * @param exclude Файл, или расширение, которое необходимо исключить из архива
-     * @param output Путь + Имя архива
+     * @param directory
+     * @param exclude
+     * @param output
      */
     public ArchivedZip(String directory, String exclude, String output) {
         this.path = new File(directory);
@@ -32,12 +32,7 @@ public class ArchivedZip {
         this.files = new Search().files(directory, Collections.singletonList(""));
     }
 
-    /**
-     * данные добавляются в Queue, достаются и сразу проверяются не является ли файл дирректорией
-     * Если файл дирректория, он добавляется в Zip
-     * Если файл не дирректория, осуществляется проверка на НЕсоответствие параметру exclude, если проверка прошла успешна,
-     * файл добавляется в Zip, затем записывается через FileInputStream;
-     */
+
     public void doZip() {
         try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(output))) {
             Queue<File> data = new LinkedList<>();
@@ -71,8 +66,8 @@ public class ArchivedZip {
     }
 
     /**
-     * @param file файл.
-     * @return форматированное полное имя файла.
+     * @param file
+     * @return file name
      */
     private String getPath(File file) {
         String result = file.getAbsolutePath().replace(path.getPath(), "");
