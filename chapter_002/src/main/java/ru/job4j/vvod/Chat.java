@@ -21,36 +21,38 @@ public class Chat {
     }
 
     /**
-     * Метод реализует чат с юзером.
-     * Если пользователь вводит слово "Стоп", вывод ответов прекращается, но чат не закрывается.
-     * Если пользователь вводит слово "Продолжить", вывод ответов возобновляется.
-     * Если пользователь вводит слово "Закончить", чат завершается.
+     * Create chat
+     * If user write "Стоп" ? then method wait, when user write "Продолжить".
+     * If user write "Закончить" , break.
      */
     public void createChat() {
-        File filein = createFileWithAnswers("text.txt");
+        File fileIn = createFileWithAnswers("text.txt");
         File fileOut = createFileWithAnswers("log.txt");
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, Charset.forName("UTF-8")))) {
             BufferedWriter bw = new BufferedWriter(new FileWriter(fileOut));
             String userSay = "";
             String compSay = "";
             boolean canSay = true;
+            String[] answers = getAnswers(fileIn);
             while ((userSay = reader.readLine()) != null) {
-                System.out.println("User say:" + userSay);
+
+                if (userSay.toLowerCase().equals("закончить")) {
+                    compSay = "Chat closed. Bye!";
+                    System.out.println("Comp say:" + compSay);
+                    bw.write(compSay + "\n");
+                    bw.flush();
+                    fileIn.delete();
+                    fileOut.delete();
+                    break;
+                }
                 canSay = proverka(userSay, canSay);
                 if (canSay) {
                     bw.write(userSay + "\n");
-                    if (userSay.toLowerCase().equals("закончить")) {
-                        compSay = "Chat closed. Bye!";
-                        System.out.println("Comp say:" + compSay);
-                        bw.write(compSay + "\n");
-                        bw.flush();
-                        filein.delete();
-                        fileOut.delete();
-                        break;
-                    }
-                    System.out.println("Chat say:" + getRandomAnswer(filein));
+                    System.out.println("User say:" + userSay);
+                    int rnd = new Random().nextInt(answers.length);
+                    System.out.println("Chat say:" + answers[rnd]);
                     bw.write(compSay + "\n");
-                }
+                } else System.out.println("Ввод текста заблокирован");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -59,8 +61,8 @@ public class Chat {
 
 
     /**
-     * Метод создает файл
-     * Если файл text.txt , то добавляем варианты ответов
+     * Create file
+     * If file name is text.txt , then add answers
      */
     private File createFileWithAnswers(String name) {
         File fileIn = new File(name);
@@ -84,10 +86,10 @@ public class Chat {
     }
 
     /**
-     * Метод берет случайный ответ из файла
+     * return String[] with answers from file
      */
 
-    private String getRandomAnswer(File file) throws IOException {
+    private String[] getAnswers(File file) throws IOException {
         List<String> array = new ArrayList<>();
         try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = "";
@@ -96,21 +98,21 @@ public class Chat {
             }
             reader.close();
         }
-        Random random = new Random();
-        String result = array.get(random.nextInt(array.size()));
+        String[] result = (String[]) array.toArray(new String[array.size()]);
         return result;
     }
 
     /**
-     * Метод проверяет наличие ключевых слов во фразе пользователя (пауза).
+     *
      */
     private boolean proverka(String userSay, boolean status) {
         boolean result = status;
         if (userSay.toLowerCase().equals("стоп")) {
             result = false;
+            System.out.println("Заблокировано");
         } else if (userSay.toLowerCase().equals("продолжить")) {
             result = true;
         }
-        return status;
+        return result;
     }
 }
