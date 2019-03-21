@@ -1,8 +1,6 @@
 package ru.job4j.vvod;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,27 +33,18 @@ public class ArchivedZip {
 
     public void doZip() {
         try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(output))) {
-            Queue<File> data = new LinkedList<>();
-            data.offer(path);
-            while (!data.isEmpty()) {
-                File file = data.poll();
-                if (file.isDirectory()) {
-                    zout.putNextEntry(new ZipEntry(getPath(file) + File.separator));
-                    for (File f : file.listFiles()) {
-                        data.offer(f);
+            Queue<File> files = createQueueList();
+            for (File file : files) {
+                if (!file.getName().contains(exclude)) {
+                    FileInputStream fin = new FileInputStream(file.getPath());
+                    zout.putNextEntry(new ZipEntry(getPath(file)));
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = fin.read(buffer)) != -1) {
+                        zout.write(buffer, 0, length);
                     }
-                } else {
-                    if (!file.getName().contains(exclude)) {
-                        FileInputStream fin = new FileInputStream(file.getPath());
-                        zout.putNextEntry(new ZipEntry(getPath(file)));
-                        byte[] buffer = new byte[1024];
-                        int length;
-                        while ((length = fin.read(buffer)) != -1) {
-                            zout.write(buffer, 0, length);
-                        }
-                        zout.closeEntry();
-                        fin.close();
-                    }
+                    zout.closeEntry();
+                    fin.close();
                 }
             }
         }
@@ -63,6 +52,20 @@ public class ArchivedZip {
             e.printStackTrace();
         }
 
+    }
+
+    private Queue<File> createQueueList() throws FileNotFoundException {
+        Queue<File> result = new LinkedList<>();
+            result.offer(path);
+            while (!result.isEmpty()) {
+                File file = result.poll();
+                if (file.isDirectory()) {
+                    for (File f : file.listFiles()) {
+                        result.offer(f);
+                    }
+                }
+            }
+        return result;
     }
 
     /**
