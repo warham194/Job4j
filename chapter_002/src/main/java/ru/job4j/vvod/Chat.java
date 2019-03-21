@@ -35,18 +35,17 @@ public class Chat {
             boolean canSay = true;
             String[] answers = getAnswers(fileIn);
             while ((userSay = reader.readLine()) != null) {
-
-                if (userSay.toLowerCase().equals("закончить")) {
-                    compSay = "Chat closed. Bye!";
-                    System.out.println("Comp say:" + compSay);
-                    bw.write(compSay + "\n");
-                    bw.flush();
-                    fileIn.delete();
-                    fileOut.delete();
-                    break;
-                }
-                canSay = proverka(userSay, canSay);
+                canSay = check(userSay, canSay);
                 if (canSay) {
+                    if (userSay.toLowerCase().equals("закончить")) {
+                        compSay = "Chat closed. Bye!";
+                        System.out.println("Comp say:" + compSay);
+                        bw.write(compSay + "\n");
+                        bw.flush();
+                        fileIn.delete();
+                        fileOut.delete();
+                        break;
+                    }
                     bw.write(userSay + "\n");
                     System.out.println("User say:" + userSay);
                     int rnd = new Random().nextInt(answers.length);
@@ -78,7 +77,6 @@ public class Chat {
                     Files.write(Paths.get(fileIn.toString()), phrases, Charset.forName("UTF-8"));
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,14 +96,10 @@ public class Chat {
             }
             reader.close();
         }
-        String[] result = (String[]) array.toArray(new String[array.size()]);
-        return result;
+        return array.toArray(new String[array.size()]);
     }
 
-    /**
-     *
-     */
-    private boolean proverka(String userSay, boolean status) {
+    private boolean check(String userSay, boolean status) {
         boolean result = status;
         if (userSay.toLowerCase().equals("стоп")) {
             result = false;
