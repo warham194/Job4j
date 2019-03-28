@@ -14,6 +14,7 @@ import java.util.Scanner;
  */
 public class Client {
     private final Socket socket;
+    final static private String END = "exit";
 
     public Client(Socket socket) {
         this.socket = socket;
@@ -32,7 +33,7 @@ public class Client {
                     System.out.println(str);
                     str = in.readLine();
                 }
-            } while (!consoleStr.equals("exit"));
+            } while (!END.equals(consoleStr));
         } catch (IOException e) {
             e.printStackTrace();
         }
